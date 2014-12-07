@@ -5,8 +5,11 @@
 
 __author__ = 'Theo Linnemann'
 
+#importing os module for directory navigation
 import os
+#importing math module for arithmetic
 import math
+#importing matplotlib for plotting features
 import matplotlib.pyplot as plt
 
 #Tuple container of stop words
@@ -16,7 +19,7 @@ CC = ( ("aren't","are not"),("can't","can not"),("could've","could have"),("coul
 contractions = dict(CC)
 
 def extractTerms(fileName, corpusTerms):
-
+    '''extractTerms takes two inputs and outputs a Term Frequency Dictionary. fileName is simply the file names and corpus terms is an empty dictionary.'''
     files = fileName
     tfds = []
     for file in files:
@@ -31,8 +34,9 @@ def extractTerms(fileName, corpusTerms):
     return(tfds)
 
 
-#Speech file input. Investigate opening multiple files
+#Speech file input.
 def readInput(filename):
+    '''readInput handles opening and closing of files, in addition to invoking the parse function. Returns a dictionary with the fully parsed speech content.'''
     D = {}
     speechfile = open(filename, 'r')
     for line in speechfile:
@@ -42,6 +46,7 @@ def readInput(filename):
 
 #Parsing function, prepares word data for stemmer use.
 def parse(documentString, D):
+    '''Parse is invoked by readInput and invokes the stemmer function to completely clean up the speech text.'''
     contractionDict = dict(CC)
     stringAccum = ''
     for word in [word.strip('".,:;!?') for word in documentString.lower().split()]:
@@ -55,7 +60,7 @@ def parse(documentString, D):
 
 #Stemmer function, strips down words to consolidate roots to a single value in preparation for vector mapping
 def stemmer(word):
-
+    '''Stemmer takes each word in the text file as input and strips it down fairly close to its root. Consistency is the primary objective. Note: This is a very weak stemmer and should not be used in production code.'''
     endingList = ['able','al','ance','ant','ar','ary','ate','ement','ence','ent','er','ess','ible','ic','ify','ine','ion','ism','iti','ity','ive','ize','ly','ment','or','ou','ous','th','ure']
 
     if word[-3:] == 'ies' and word [-4:] not in ['eies', 'aies']:
@@ -71,10 +76,12 @@ def stemmer(word):
     return(word)
 
 def topK(D,k):
+    '''Simple function used only for finding the top K terms in a given speech.'''
     L = [(item,D[item]) for item in D.keys() ]
     return(sorted(L, reverse = True, key = lambda x: x[1]) [0:k])
 
 def createModels(tfds, cfd, k):
+    '''Create models takes the TFDS, Corpus Freency Dictionary (CFD), and k (number of most common terms requested) as inputs. Its output of words and models are used by the barGraph function to create a histogram. '''
     words = topK(cfd,k)
     words = tuple([term for term,frequency in words])
     lengthList = [sum(tfds[i].values()) for i in range(len(tfds))]
@@ -82,6 +89,7 @@ def createModels(tfds, cfd, k):
     models=[]
 
     for wordbanks in range(len(tfds)):
+        #Note most IDE's will evaluate w as type list containing None, because of line 93. Upon execution list w will contain type float.
         w = [None]*len(words)
         for k in range(len(words)):
 
@@ -100,15 +108,16 @@ def createModels(tfds, cfd, k):
 
             w[k] = tf * math.log(rightNum/rightDen)
 
-        #Begin normalization
+        #Begin normalization. Note w[i] will be evaluated as empty by most IDE's. It is safe to ignore this warning instance.
         u = math.sqrt(sum([  w[i]**2 for i in range(len(w)) ]))
         for i in range(len(w)):
+            #Note w[i] will be evaluated by most IDE's as type empty until execution. It is safe to ignore this warning instance.
             w[i] = w[i] / u
         models.append(tuple(w))
-    #[name{:-5} for name in files]
     return(words, models)
 
 def dotProduct(tuple1, tuple2):
+    '''dotProduct takes 2 tuples (vectors) as inputs and computes their dotproduct.'''
     dotproduct = 0
     for currentindex in range(len(tuple1)):
         print(tuple1)
@@ -116,6 +125,7 @@ def dotProduct(tuple1, tuple2):
     return(dotproduct)
 
 def averagedotproducts(models):
+    '''Computes the average of two dotproducts, takes the list models as an input, outputs a list of averaged dotproducts. Note: This function assumes 4 speech samples per president.'''
     listofaverages = []
     for president in range(0, len(models), 4):
         dpList = []
@@ -126,6 +136,7 @@ def averagedotproducts(models):
     return(listofaverages)
 
 def barGraph(presidentNames, listofaverages):
+    '''Generates a histogram of averaged normalized vectors and plots them for each president.'''
     plt.title('Presidential Speech Comparison')
     plt.xlabel('Presidents Averaged Normalized Vector')
     plt.ylabel('Presidents')
@@ -140,12 +151,13 @@ if __name__ == "__main__":
     #files = [f for f in os.listdir('.') if os.path.isfile(f)]
     #print(len(files))
 
-
+    #These 4 lines execute on file open to generate a histogram of normalized vectors.
     #A = extractTerms(files.F, corpusTerms)
     #B = createModels(A, corpusTerms, 100)
     #averages = averagedotproducts(B[1])
     #barGraph(files.P, averages)
 
+    #These four lines are used to evaluate unknown speeches. Currently not functional.
     A = extractTerms(files.U, corpusTerms)
     B = createModels(A, corpusTerms, 100)
     averages = averagedotproducts(B[1])
