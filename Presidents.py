@@ -12,7 +12,7 @@ import os
 import math
 #importing matplotlib for plotting features
 import matplotlib.pyplot as plt
-#importing secondary stemmer library for stronger stemming feature set. Comment out if weak stemmer is preferred. 
+#importing secondary stemmer library for stronger stemming feature set. Comment out if weak stemmer is preferred.
 import stemming.porter2 as porter2
 
 #Tuple container of stop words
@@ -138,7 +138,7 @@ def averagedotproducts(models):
     for president in range(0, len(models), 4):
         dpList = []
         #i is used as an index handle.
-        for i in range(president, president+4):
+        for i in range(president, president+3):
             #j is used as an index handle that's by definition i+1.
             for j in range(i+1, president + 4):
                 dpList.append(dotProduct(models[i],  models[j]))
