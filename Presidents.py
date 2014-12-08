@@ -147,18 +147,18 @@ def barGraph(presidentNames, listofaverages):
 if __name__ == "__main__":
     corpusTerms = {}
     import files
-    os.chdir(os.getcwd() + '\\unknowns/')
+    os.chdir(os.getcwd() + '\\corpus/')
     #files = [f for f in os.listdir('.') if os.path.isfile(f)]
     #print(len(files))
 
     #These 4 lines execute on file open to generate a histogram of normalized vectors.
-    #A = extractTerms(files.F, corpusTerms)
-    #B = createModels(A, corpusTerms, 100)
-    #averages = averagedotproducts(B[1])
-    #barGraph(files.P, averages)
+    A = extractTerms(files.F, corpusTerms)
+    B = createModels(A, corpusTerms, 100)
+    averages = averagedotproducts(B[1])
+    barGraph(files.P, averages)
 
-    #These four lines are used to evaluate unknown speeches. Currently not functional.
+    '''#These four lines are used to evaluate unknown speeches. Currently not functional.
     A = extractTerms(files.U, corpusTerms)
     B = createModels(A, corpusTerms, 100)
     averages = averagedotproducts(B[1])
-    barGraph(files.U, averages)
+    barGraph(files.U, averages)'''
