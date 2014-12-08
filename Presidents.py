@@ -2,6 +2,7 @@
 # Theo Linnemann
 #22C:016:A05
 # Based on code provided by Professor Alberto Maria Sergre
+#Uses the purepython implementation of the SnowBall stemming libarary. Note: This purepython implementation is ~100x slower than python wrapped C implementations and should not be used in prod code.
 
 __author__ = 'Theo Linnemann'
 
@@ -11,6 +12,8 @@ import os
 import math
 #importing matplotlib for plotting features
 import matplotlib.pyplot as plt
+#importing secondary stemmer library for stronger stemming feature set. Comment out if weak stemmer is preferred. 
+import stemming.porter2 as porter2
 
 #Tuple container of stop words
 SW = ( 'a','able','about','across','after','all','almost','also','am','among','an','and','any','are','as','at','be','because','been','but','by','can','cannot','could','dear','did','do','does','either','else','ever','every','for','from','get','got','had','has','have','he','her','hers','him','his','how','however','i','if','in','into','is','it','its','just','least','let','like','likely','may','me','might','most','must','my','neither','no','nor','not','of','off','often','on','only','or','other','our','own','rather','said','say','says','she','should','since','so','some','than','that','the','their','them','then','there','these','they','this','tis','to','too','twas','us','wants','was','we','were','what','when','where','which','while','who','whom','why','will','with','would','yet','you','your' )
@@ -52,28 +55,31 @@ def parse(documentString, D):
     for word in [word.strip('".,:;!?') for word in documentString.lower().split()]:
         if word in contractionDict:
             stringAccum = stringAccum + ' ' + contractionDict[word]
-    for word in [stemmer(word) for word in [word.strip('".,:;!?') for word in documentString.lower().split()] if (word not in SW) and (word not in contractionDict.keys()) ]:
+    #Replace 'porter2.stem' with 'stemmer' if weak stemmer is preferred.
+    for word in [porter2.stem(word) for word in [word.strip('".,:;!?') for word in documentString.lower().split()] if (word not in SW) and (word not in contractionDict.keys()) ]:
         if word in D:
             D[word] = D[word] + 1
         else:
             D[word] = 1
 
-#Stemmer function, strips down words to consolidate roots to a single value in preparation for vector mapping
-def stemmer(word):
-    '''Stemmer takes each word in the text file as input and strips it down fairly close to its root. Consistency is the primary objective. Note: This is a very weak stemmer and should not be used in production code.'''
-    endingList = ['able','al','ance','ant','ar','ary','ate','ement','ence','ent','er','ess','ible','ic','ify','ine','ion','ism','iti','ity','ive','ize','ly','ment','or','ou','ous','th','ure']
-
-    if word[-3:] == 'ies' and word [-4:] not in ['eies', 'aies']:
-        word = word[:-3] + 'y'
-    if word[-2:] == 'es' and word[-3:] not in ['aes', 'ees', 'oes']:
-        word = word[:-1]
-    if word[-1:] == 's' and word[-2:] not in ['us', 'ss', 'ys']:
-        word = word[:-1]
-
-    for i in range(1,5):
-        if word[-i:] in endingList:
-            word = word[:-i]
-    return(word)
+# #Stemmer function, strips down words to consolidate roots to a single value in preparation for vector mapping
+# def stemmer(word):
+#     '''Stemmer takes each word in the text file as input and strips it down fairly close to its root. Consistency is the primary objective. Note: This is a very weak stemmer and should not be used in production code.'''
+#     endingList = ['able','al','ance','ant','ar','ary','ate','ement','ence','ent','er','ess','ible','ic','ify','ine','ion','ism','iti','ity','ive','ize','ly','ment','or','ou','ous','th','ure']
+#
+#     #Stemmer exceptions code.
+#     if word[-3:] == 'ies' and word [-4:] not in ['eies', 'aies']:
+#         word = word[:-3] + 'y'
+#     if word[-2:] == 'es' and word[-3:] not in ['aes', 'ees', 'oes']:
+#         word = word[:-1]
+#     if word[-1:] == 's' and word[-2:] not in ['us', 'ss', 'ys']:
+#         word = word[:-1]
+#
+#     #Primary stripping mechanics.
+#     for i in range(1,5):
+#         if word[-i:] in endingList:
+#             word = word[:-i]
+#     return(word)
 
 def topK(D,k):
     '''Simple function used only for finding the top K terms in a given speech.'''
@@ -118,18 +124,22 @@ def createModels(tfds, cfd, k):
 
 def dotProduct(tuple1, tuple2):
     '''dotProduct takes 2 tuples (vectors) as inputs and computes their dotproduct.'''
+    #Simply accumulator structure. print statement may be uncommented to view actual DP values during debugging.
     dotproduct = 0
     for currentindex in range(len(tuple1)):
-        print(tuple1)
+        #print(tuple1)
         dotproduct += tuple1[currentindex] * tuple2[currentindex]
     return(dotproduct)
 
 def averagedotproducts(models):
     '''Computes the average of two dotproducts, takes the list models as an input, outputs a list of averaged dotproducts. Note: This function assumes 4 speech samples per president.'''
     listofaverages = []
+    #Any data set with a different number of speeches per speaker will need to modify the step value of the first range method. This change should be mirrored in presidents+step in the rest of the function.
     for president in range(0, len(models), 4):
         dpList = []
+        #i is used as an index handle.
         for i in range(president, president+4):
+            #j is used as an index handle that's by definition i+1.
             for j in range(i+1, president + 4):
                 dpList.append(dotProduct(models[i],  models[j]))
         listofaverages.append(sum(dpList)/len(dpList))
