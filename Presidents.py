@@ -2,7 +2,8 @@
 # Theo Linnemann
 #22C:016:A05
 # Based on code provided by Professor Alberto Maria Sergre
-#Uses the purepython implementation of the SnowBall stemming libarary. Note: This purepython implementation is ~100x slower than python wrapped C implementations and should not be used in prod code.
+# Project repository can be found at: https://github.com/ZeroCool2u/VectorSMGen/tree/master
+# Uses the purepython implementation of the SnowBall stemming libarary. Note: This purepython implementation is ~100x slower than python wrapped C implementations and should not be used in prod code.
 
 __author__ = 'Theo Linnemann'
 
