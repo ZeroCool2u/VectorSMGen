@@ -155,6 +155,15 @@ def barGraph(presidentNames, listofaverages):
     plt.barh(range(len(listofaverages), 0,-1), listofaverages)
     plt.show()
 
+# def histogram(listofaverages):
+#     '''Generates a histogram. This differs only in the formatting of how our data is represented, compared to barGraph() function.'''
+#     plt.title('Presidential Speech Comparison')
+#     plt.xlabel('Normalized Vector Value')
+#     plt.ylabel("Frequency of Presidents at a Vector Value")
+#     #Note the hardcoded bin steps. The bin argument may be removed if you'd like bin steps generated automatically.
+#     plt.hist(listofaverages, bins=(.45, .50, .55, .60, .65, .70, .75, .80, .85, .90, .95, 1), histtype='bar', orientation='vertical')
+#     plt.show()
+
 if __name__ == "__main__":
     corpusTerms = {}
     import files
@@ -167,9 +176,10 @@ if __name__ == "__main__":
     B = createModels(A, corpusTerms, 100)
     averages = averagedotproducts(B[1])
     barGraph(files.P, averages)
+    #histogram(averages)
 
-    '''#These four lines are used to evaluate unknown speeches. Currently not functional.
-    A = extractTerms(files.U, corpusTerms)
-    B = createModels(A, corpusTerms, 100)
-    averages = averagedotproducts(B[1])
-    barGraph(files.U, averages)'''
+    # #These four lines are used to evaluate unknown speeches. Currently not functional.
+    # A = extractTerms(files.U, corpusTerms)
+    # B = createModels(A, corpusTerms, 100)
+    # averages = averagedotproducts(B[1])
+    # barGraph(files.U, averages)
