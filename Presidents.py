@@ -22,6 +22,7 @@ CC = ( ("aren't","are not"),("can't","can not"),("could've","could have"),("coul
 
 contractions = dict(CC)
 
+
 def extractTerms(fileName, corpusTerms):
     '''extractTerms takes two inputs and outputs a Term Frequency Dictionary. fileName is simply the file names and corpus terms is an empty dictionary.'''
     files = fileName
@@ -48,9 +49,10 @@ def readInput(filename):
     speechfile.close()
     return(D)
 
+
 #Parsing function, prepares word data for stemmer use.
 def parse(documentString, D):
-    '''Parse is invoked by readInput and invokes the stemmer function to completely clean up the speech text.'''
+    """Parse is invoked by readInput and invokes the stemmer function to completely clean up the speech text."""
     contractionDict = dict(CC)
     stringAccum = ''
     for word in [word.strip('".,:;!?') for word in documentString.lower().split()]:
@@ -62,6 +64,7 @@ def parse(documentString, D):
             D[word] = D[word] + 1
         else:
             D[word] = 1
+
 
 # #Stemmer function, strips down words to consolidate roots to a single value in preparation for vector mapping
 # def stemmer(word):
@@ -82,10 +85,12 @@ def parse(documentString, D):
 #             word = word[:-i]
 #     return(word)
 
+
 def topK(D,k):
     '''Simple function used only for finding the top K terms in a given speech.'''
     L = [(item,D[item]) for item in D.keys() ]
     return(sorted(L, reverse = True, key = lambda x: x[1]) [0:k])
+
 
 def createModels(tfds, cfd, k):
     '''Create models takes the TFDS, Corpus Freency Dictionary (CFD), and k (number of most common terms requested) as inputs. Its output of words and models are used by the barGraph function to create a histogram. '''
@@ -123,6 +128,7 @@ def createModels(tfds, cfd, k):
         models.append(tuple(w))
     return(words, models)
 
+
 def dotProduct(tuple1, tuple2):
     '''dotProduct takes 2 tuples (vectors) as inputs and computes their dotproduct.'''
     #Simply accumulator structure. print statement may be uncommented to view actual DP values during debugging.
@@ -131,6 +137,7 @@ def dotProduct(tuple1, tuple2):
         #print(tuple1)
         dotproduct += tuple1[currentindex] * tuple2[currentindex]
     return(dotproduct)
+
 
 def averagedotproducts(models):
     '''Computes the average of two dotproducts, takes the list models as an input, outputs a list of averaged dotproducts. Note: This function assumes 4 speech samples per president.'''
@@ -146,6 +153,7 @@ def averagedotproducts(models):
         listofaverages.append(sum(dpList)/len(dpList))
     return(listofaverages)
 
+
 def barGraph(presidentNames, listofaverages):
     '''Generates a histogram of averaged normalized vectors and plots them for each president.'''
     plt.title('Presidential Speech Comparison')
@@ -155,6 +163,7 @@ def barGraph(presidentNames, listofaverages):
     plt.barh(range(len(listofaverages), 0,-1), listofaverages)
     plt.show()
 
+
 # def histogram(listofaverages):
 #     '''Generates a histogram. This differs only in the formatting of how our data is represented, compared to barGraph() function.'''
 #     plt.title('Presidential Speech Comparison')
@@ -163,6 +172,7 @@ def barGraph(presidentNames, listofaverages):
 #     #Note the hardcoded bin steps. The bin argument may be removed if you'd like bin steps generated automatically.
 #     plt.hist(listofaverages, bins=(.45, .50, .55, .60, .65, .70, .75, .80, .85, .90, .95, 1), histtype='bar', orientation='vertical')
 #     plt.show()
+
 
 if __name__ == "__main__":
     corpusTerms = {}
