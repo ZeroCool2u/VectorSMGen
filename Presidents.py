@@ -7,8 +7,9 @@
 
 __author__ = 'Theo Linnemann'
 
-#importing os module for directory navigation
+#importing os and files modules for directory navigation
 import os
+import files
 #importing math module for arithmetic
 import math
 #importing matplotlib for plotting features
@@ -22,48 +23,51 @@ CC = ( ("aren't","are not"),("can't","can not"),("could've","could have"),("coul
 
 contractions = dict(CC)
 
+corpusTerms = {}
 
 def extractTerms(fileName, corpusTerms):
-    '''extractTerms takes two inputs and outputs a Term Frequency Dictionary. fileName is simply the file names and corpus terms is an empty dictionary.'''
-    files = fileName
-    tfds = []
-    for file in files:
-        tfds.append(readInput(file))
-    for termBank in tfds:
-        for term in termBank:
-            #print(term, termBank[term])
-            if term in corpusTerms:
-                corpusTerms[term] += 1
-            else:
-                corpusTerms[term] = 1
-    return(tfds)
+	'''extractTerms takes two inputs and outputs a Term Frequency Dictionary. fileName is simply the file names and corpus terms is an empty dictionary.'''
+	files = fileName
+	tfds = []
+	for file in files:
+		tfds.append(readInput(file))
+	for termBank in tfds:
+		for term in termBank:
+			#print(term, termBank[term])
+			if term in corpusTerms:
+				corpusTerms[term] += 1
+			else:
+				corpusTerms[term] = 1
+	if verbose == 1:
+		print(tfds)
+	return(tfds)
 
 
 #Speech file input.
 def readInput(filename):
-    '''readInput handles opening and closing of files, in addition to invoking the parse function. Returns a dictionary with the fully parsed speech content.'''
-    D = {}
-    speechfile = open(filename, 'r')
-    for line in speechfile:
-        parse(line, D)
-    speechfile.close()
-    return(D)
+	'''readInput handles opening and closing of files, in addition to invoking the parse function. Returns a dictionary with the fully parsed speech content.'''
+	D = {}
+	speechfile = open(filename, 'r')
+	for line in speechfile:
+		parse(line, D)
+	speechfile.close()
+	return(D)
 
 
 #Parsing function, prepares word data for stemmer use.
 def parse(documentString, D):
-    """Parse is invoked by readInput and invokes the stemmer function to completely clean up the speech text."""
-    contractionDict = dict(CC)
-    stringAccum = ''
-    for word in [word.strip('".,:;!?') for word in documentString.lower().split()]:
-        if word in contractionDict:
-            stringAccum = stringAccum + ' ' + contractionDict[word]
-    #Replace 'porter2.stem' with 'stemmer' if weak stemmer is preferred.
-    for word in [porter2.stem(word) for word in [word.strip('".,:;!?') for word in documentString.lower().split()] if (word not in SW) and (word not in contractionDict.keys()) ]:
-        if word in D:
-            D[word] = D[word] + 1
-        else:
-            D[word] = 1
+	"""Parse is invoked by readInput and invokes the stemmer function to completely clean up the speech text."""
+	contractionDict = dict(CC)
+	stringAccum = ''
+	for word in [word.strip('".,:;!?') for word in documentString.lower().split()]:
+		if word in contractionDict:
+			stringAccum = stringAccum + ' ' + contractionDict[word]
+	#Replace 'porter2.stem' with 'stemmer' if weak stemmer is preferred.
+	for word in [porter2.stem(word) for word in [word.strip('".,:;!?') for word in documentString.lower().split()] if (word not in SW) and (word not in contractionDict.keys()) ]:
+		if word in D:
+			D[word] = D[word] + 1
+		else:
+			D[word] = 1
 
 
 # #Stemmer function, strips down words to consolidate roots to a single value in preparation for vector mapping
@@ -87,81 +91,83 @@ def parse(documentString, D):
 
 
 def topK(D,k):
-    '''Simple function used only for finding the top K terms in a given speech.'''
-    L = [(item,D[item]) for item in D.keys() ]
-    return(sorted(L, reverse = True, key = lambda x: x[1]) [0:k])
+	'''Simple function used only for finding the top K terms in a given speech.'''
+	L = [(item,D[item]) for item in D.keys() ]
+	return(sorted(L, reverse = True, key = lambda x: x[1]) [0:k])
 
 
 def createModels(tfds, cfd, k):
-    '''Create models takes the TFDS, Corpus Frequency Dictionary (CFD), and k (number of most common terms requested) as inputs. Its output of words and models are used by the barGraph function to create a histogram. '''
-    words = topK(cfd,k)
-    words = tuple([term for term, frequency in words])
-    lengthList = [sum(tfds[i].values()) for i in range(len(tfds))]
+	'''Create models takes the TFDS, Corpus Frequency Dictionary (CFD), and k (number of most common terms requested) as inputs. Its output of words and models are used by the barGraph function to create a histogram. '''
+	words = topK(cfd, k)
+	words = tuple([term for term, frequency in words])
+	lengthList = [sum(tfds[i].values()) for i in range(len(tfds))]
 
-    models=[]
+	models = []
 
-    for wordbanks in range(len(tfds)):
-        #Note most IDE's will evaluate w as type list containing None, because of line 93. Upon execution list w will contain type float.
-        w = [None]*len(words)
-        for k in range(len(words)):
+	for wordbanks in range(len(tfds)):
+		#Note most IDE's will evaluate w as type list containing None, because of line 107. Upon execution list w will contain type float.
+		w = [None]*len(words)
+		for k in range(len(words)):
 
-            #Computation for term frequency
-            term = words[k]
-            if term in tfds[wordbanks]:
-                numerator = tfds[wordbanks][term]
-            else:
-                numerator = 0
-            denominator = lengthList[wordbanks]
-            tf = numerator / denominator
+			#Computation for term frequency
+			term = words[k]
+			if term in tfds[wordbanks]:
+				numerator = tfds[wordbanks][term]
+			else:
+				numerator = 0
+			denominator = lengthList[wordbanks]
+			tf = numerator / denominator
 
-            #Tf computation complete. Beginning computation for log expression.
-            rightNum = len(lengthList)
-            rightDen = 1 + cfd[term]
+			#Tf computation complete. Beginning computation for log expression.
+			rightNum = len(lengthList)
+			rightDen = 1 + cfd[term]
 
-            w[k] = tf * math.log(rightNum/rightDen)
+			w[k] = tf * math.log(rightNum/rightDen)
 
-        #Begin normalization. Note w[i] will be evaluated as empty by most IDE's. It is safe to ignore this warning instance.
-        u = math.sqrt(sum([  w[i]**2 for i in range(len(w)) ]))
-        for i in range(len(w)):
-            #Note w[i] will be evaluated by most IDE's as type empty until execution. It is safe to ignore this warning instance.
-            w[i] = w[i] / u
-        models.append(tuple(w))
-    return(words, models)
+		#Begin normalization. Note w[i] will be evaluated as empty by most IDE's. It is safe to ignore this warning instance.
+		u = math.sqrt(sum([  w[i]**2 for i in range(len(w)) ]))
+		for i in range(len(w)):
+			#Note w[i] will be evaluated by most IDE's as type empty until execution. It is safe to ignore this warning instance.
+			w[i] = w[i] / u
+		models.append(tuple(w))
+	if verbose == 1:
+		print(words, models)
+	return(words, models)
 
 
 def dotProduct(tuple1, tuple2):
-    '''dotProduct takes 2 tuples (vectors) as inputs and computes their dotproduct.'''
-    #Simply accumulator structure. print statement may be uncommented to view actual DP values during debugging.
-    dotproduct = 0
-    for currentindex in range(len(tuple1)):
-        #print(tuple1)
-        dotproduct += tuple1[currentindex] * tuple2[currentindex]
-    return(dotproduct)
+	'''dotProduct takes 2 tuples (vectors) as inputs and computes their dotproduct.'''
+	#Simple accumulator structure. print statement may be uncommented to view actual DP values during debugging.
+	dotproduct = 0
+	for currentindex in range(len(tuple1)):
+		#print(tuple1)
+		dotproduct += tuple1[currentindex] * tuple2[currentindex]
+	return(dotproduct)
 
 
 def averagedotproducts(models):
-    '''Computes the average of two dotproducts, takes the list models as an input, outputs a list of averaged dotproducts. Note: This function assumes 4 speech samples per president.'''
-    listofaverages = []
-    #Any data set with a different number of speeches per speaker will need to modify the step value of the first range method. This change should be mirrored in presidents+step in the rest of the function.
-    for president in range(0, len(models), 4):
-        dpList = []
-        #i is used as an index handle.
-        for i in range(president, president+3):
-            #j is used as an index handle that's by definition i+1.
-            for j in range(i+1, president + 4):
-                dpList.append(dotProduct(models[i],  models[j]))
-        listofaverages.append(sum(dpList)/len(dpList))
-    return(listofaverages)
+	'''Computes the average of two dotproducts, takes the list models as an input, outputs a list of averaged dotproducts. Note: This function assumes 4 speech samples per president.'''
+	listofaverages = []
+	#Any data set with a different number of speeches per speaker will need to modify the step value of the first range method. This change should be mirrored in presidents+step in the rest of the function.
+	for president in range(0, len(models), 4):
+		dpList = []
+		#i is used as an index handle.
+		for i in range(president, president+3):
+			#j is used as an index handle that's by definition i+1.
+			for j in range(i+1, president + 4):
+				dpList.append(dotProduct(models[i],  models[j]))
+		listofaverages.append(sum(dpList)/len(dpList))
+	return(listofaverages)
 
 
 def barGraph(presidentNames, listofaverages):
-    '''Generates a histogram of averaged normalized vectors and plots them for each president.'''
-    plt.title('Presidential Speech Comparison')
-    plt.xlabel('Presidents Averaged Normalized Vector')
-    plt.ylabel('Presidents')
-    plt.yticks(range(len(presidentNames), 0, -1), presidentNames)
-    plt.barh(range(len(listofaverages), 0,-1), listofaverages)
-    plt.show()
+	'''Generates a histogram of averaged normalized vectors and plots them for each president.'''
+	plt.title('Presidential Speech Comparison')
+	plt.xlabel('Presidents Averaged Normalized Vector')
+	plt.ylabel('Presidents')
+	plt.yticks(range(len(presidentNames), 0, -1), presidentNames)
+	plt.barh(range(len(listofaverages), 0, -1), listofaverages)
+	plt.show()
 
 
 # def histogram(listofaverages):
@@ -173,23 +179,69 @@ def barGraph(presidentNames, listofaverages):
 #     plt.hist(listofaverages, bins=(.45, .50, .55, .60, .65, .70, .75, .80, .85, .90, .95, 1), histtype='bar', orientation='vertical')
 #     plt.show()
 
+def compareUknowns(k, fileName,models):
+	tfds = extractTerms(fileName, corpusTerms)
+	unknowns = createModels(tfds, corpusTerms, k)[1]
+	listOfPresidentsAverageVectors = []
+
+	def vectorAverage(president):
+		"""computes a vector average"""
+		presidentAverage = k * [0]
+		for index in range(k):
+			for vector in president:
+				presidentAverage[index] += vector[index] / 4
+		return(presidentAverage)
+
+	for president in range(0, len(models), 4):
+		singleVectorList = []
+		for i in range(president, president+4):
+			singleVectorList.append(models[i])
+		singleVector = vectorAverage(singleVectorList)
+		#Creates list of average presidential vectors. [president1 = [vectorvalue1,vectorvalue2,...], ...]
+		listOfPresidentsAverageVectors.append(singleVector)
+
+	#init bestscore at high value out of bounds
+	bestScore = 1000
+
+	def compare(index, unknown, bestscore, competitor):
+		"""Comapres the difference between 2 vector values."""
+		if abs(unknown - competitor) > abs(unknown - bestscore[0]):
+			return bestscore
+		else:
+			print(competitor, index)
+			return competitor, index
+
+	listOfBestScores = [[(bestScore, -1) for x in range(k)] for u in unknowns]
+
+	for unknown in range(len(unknowns)):
+		for wordScoreIndex in range(k):
+			for index in range(len(listOfPresidentsAverageVectors)):
+				print(index)
+				listOfBestScores[unknown][wordScoreIndex] = compare(index, unknowns[unknown][index], listOfBestScores[unknown][wordScoreIndex], listOfPresidentsAverageVectors[index][wordScoreIndex])
+
+	return zip(fileName, [[files.P[b] for a, b in columns] for columns in listOfBestScores])
 
 if __name__ == "__main__":
-    corpusTerms = {}
-    import files
-    os.chdir(os.getcwd() + '\\corpus/')
-    #files = [f for f in os.listdir('.') if os.path.isfile(f)]
-    #print(len(files))
+	#Debug option:
+	verbose = 0
 
-    #These 4 lines execute on file open to generate a histogram of normalized vectors.
-    A = extractTerms(files.F, corpusTerms)
-    B = createModels(A, corpusTerms, 100)
-    averages = averagedotproducts(B[1])
-    barGraph(files.P, averages)
-    #histogram(averages)
+	#Change 'corpus' to 'unknowns' if comparing unknown speeches. This is only necessary if comparing unknowns.
+	#os.chdir(os.getcwd() + '\\corpus/')
+	#os.chdir(os.getcwd() + '\\unknowns/')
+	#files = [f for f in os.listdir('.') if os.path.isfile(f)]
+	#print(len(files))
 
-    # #These four lines are used to evaluate unknown speeches. Currently not functional.
-    # A = extractTerms(files.U, corpusTerms)
-    # B = createModels(A, corpusTerms, 100)
-    # averages = averagedotproducts(B[1])
-    # barGraph(files.U, averages)
+	#These lines execute on file open to generate a histogram/barchart of normalized vectors. Enable only 1 of the last 2 lines.
+	A = extractTerms(files.F, corpusTerms)
+	B = createModels(A, corpusTerms, 100)
+	averages = averagedotproducts(B[1])
+	barGraph(files.P, averages)
+	#histogram(averages)
+
+	# #These four lines are used to evaluate unknown speeches.
+	# A = extractTerms(files.F, corpusTerms)
+	# B = createModels(A, corpusTerms, 100)
+	# models = B[1]
+	# Estimates = compareUknowns(100, files.U, models)
+	# for line in Estimates:
+	# 	print (line[0] + ": "+str(line[1]))
