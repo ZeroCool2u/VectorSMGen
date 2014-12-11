@@ -140,7 +140,8 @@ def dotProduct(tuple1, tuple2):
 	#Simple accumulator structure. print statement may be uncommented to view actual DP values during debugging.
 	dotproduct = 0
 	for currentindex in range(len(tuple1)):
-		#print(tuple1)
+		if verbose == 1:
+			print(tuple1)
 		dotproduct += tuple1[currentindex] * tuple2[currentindex]
 	return(dotproduct)
 
@@ -179,13 +180,13 @@ def barGraph(presidentNames, listofaverages):
 #     plt.hist(listofaverages, bins=(.45, .50, .55, .60, .65, .70, .75, .80, .85, .90, .95, 1), histtype='bar', orientation='vertical')
 #     plt.show()
 
-def compareUknowns(k, fileName,models):
+def compareUknowns(k, fileName, models):
 	tfds = extractTerms(fileName, corpusTerms)
 	unknowns = createModels(tfds, corpusTerms, k)[1]
 	listOfPresidentsAverageVectors = []
 
 	def vectorAverage(president):
-		"""computes a vector average"""
+		"""computes an average vector for a single speakers corpus."""
 		presidentAverage = k * [0]
 		for index in range(k):
 			for vector in president:
@@ -196,8 +197,14 @@ def compareUknowns(k, fileName,models):
 		singleVectorList = []
 		for i in range(president, president+4):
 			singleVectorList.append(models[i])
+		if verbose == 1:
+			print(singleVectorList)
 		singleVector = vectorAverage(singleVectorList)
+		if verbose == 1:
+			print(singleVector)
 		#Creates list of average presidential vectors. [president1 = [vectorvalue1,vectorvalue2,...], ...]
+		if verbose == 1:
+			print(listOfPresidentsAverageVectors)
 		listOfPresidentsAverageVectors.append(singleVector)
 
 	#init bestscore at high value out of bounds
@@ -206,9 +213,12 @@ def compareUknowns(k, fileName,models):
 	def compare(index, unknown, bestscore, competitor):
 		"""Comapres the difference between 2 vector values."""
 		if abs(unknown - competitor) > abs(unknown - bestscore[0]):
+			if verbose == 1:
+				print(bestscore)
 			return bestscore
 		else:
-			print(competitor, index)
+			if verbose == 1:
+				print(competitor, index)
 			return competitor, index
 
 	listOfBestScores = [[(bestScore, -1) for x in range(k)] for u in unknowns]
