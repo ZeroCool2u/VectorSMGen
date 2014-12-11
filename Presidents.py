@@ -2,7 +2,7 @@
 # Theo Linnemann
 #22C:016:A05
 # Based on code provided by Professor Alberto Maria Sergre
-# Project repository can be found at: https://github.com/ZeroCool2u/VectorSMGen/tree/master
+# Project repository can be found at: https://github.com/ZeroCool2u/VectorSMGen
 # Uses the purepython implementation of the SnowBall stemming libarary. Note: This purepython implementation is ~100x slower than python wrapped C implementations and should not be used in prod code.
 
 __author__ = 'Theo Linnemann'
@@ -137,7 +137,7 @@ def createModels(tfds, cfd, k):
 
 def dotProduct(tuple1, tuple2):
 	'''dotProduct takes 2 tuples (vectors) as inputs and computes their dotproduct.'''
-	#Simple accumulator structure. print statement may be uncommented to view actual DP values during debugging.
+	#Simple accumulator structure to compute the dot product of 2 vectors.
 	dotproduct = 0
 	for currentindex in range(len(tuple1)):
 		if verbose == 1:
@@ -226,14 +226,15 @@ def compareUknowns(k, fileName, models):
 	for unknown in range(len(unknowns)):
 		for wordScoreIndex in range(k):
 			for index in range(len(listOfPresidentsAverageVectors)):
-				print(index)
+				if verbose == 1:
+					print(index)
 				listOfBestScores[unknown][wordScoreIndex] = compare(index, unknowns[unknown][index], listOfBestScores[unknown][wordScoreIndex], listOfPresidentsAverageVectors[index][wordScoreIndex])
 
 	return zip(fileName, [[files.P[b] for a, b in columns] for columns in listOfBestScores])
 
 if __name__ == "__main__":
-	#Debug option:
-	verbose = 0
+	#Debug option. Set to 1 to print debug information:
+	verbose = 1
 
 	#Change 'corpus' to 'unknowns' if comparing unknown speeches. This is only necessary if comparing unknowns.
 	#os.chdir(os.getcwd() + '\\corpus/')
