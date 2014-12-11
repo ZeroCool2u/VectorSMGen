@@ -93,9 +93,9 @@ def topK(D,k):
 
 
 def createModels(tfds, cfd, k):
-    '''Create models takes the TFDS, Corpus Freency Dictionary (CFD), and k (number of most common terms requested) as inputs. Its output of words and models are used by the barGraph function to create a histogram. '''
+    '''Create models takes the TFDS, Corpus Frequency Dictionary (CFD), and k (number of most common terms requested) as inputs. Its output of words and models are used by the barGraph function to create a histogram. '''
     words = topK(cfd,k)
-    words = tuple([term for term,frequency in words])
+    words = tuple([term for term, frequency in words])
     lengthList = [sum(tfds[i].values()) for i in range(len(tfds))]
 
     models=[]
