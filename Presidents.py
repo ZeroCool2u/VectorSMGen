@@ -1,4 +1,4 @@
-#22c16 Project 2: Presidents
+# 22c16 Project 2: Presidents
 # Theo Linnemann
 #22C:016:A05
 # Based on code provided by Professor Alberto Maria Sergre
@@ -8,7 +8,6 @@
 __author__ = 'Theo Linnemann'
 
 #importing os and files modules for directory navigation
-import os
 import files
 #importing math module for arithmetic
 import math
@@ -18,12 +17,42 @@ import matplotlib.pyplot as plt
 import stemming.porter2 as porter2
 
 #Tuple container of stop words
-SW = ( 'a','able','about','across','after','all','almost','also','am','among','an','and','any','are','as','at','be','because','been','but','by','can','cannot','could','dear','did','do','does','either','else','ever','every','for','from','get','got','had','has','have','he','her','hers','him','his','how','however','i','if','in','into','is','it','its','just','least','let','like','likely','may','me','might','most','must','my','neither','no','nor','not','of','off','often','on','only','or','other','our','own','rather','said','say','says','she','should','since','so','some','than','that','the','their','them','then','there','these','they','this','tis','to','too','twas','us','wants','was','we','were','what','when','where','which','while','who','whom','why','will','with','would','yet','you','your' )
-CC = ( ("aren't","are not"),("can't","can not"),("could've","could have"),("couldn't","could not"),("couldn't've","could not have"),("didn't","did not"),("doesn't","does not"),("don't","do not"),("hadn't","had not"),("hadn't've","had not have"),("hasn't","has not"),("haven't","have not"),("he'd","he had"),("he'd've","he would have"),("he'll","he will"),("he's","he is"),("how'd","how did"),("how'll","how will"),("how's","how has"),("I'd","I had"),("I'd've","I would have"),("I'll","I will"),("I'm","I am"),("I've","I have"),("isn't","is not"),("it'd","it had"),("it'd've","it would have"),("it'll","it will"),("it's","it is"),("let's","let us"),("ma'am","madam"),("mightn't","might not"),("mightn't've","might not have"),("might've","might have"),("mustn't","must not"),("must've","must have"),("needn't","need not"),("not've","not have"),("o'clock","of the clock"),("shan't","shall not"),("she'd","she had"),("she'd've","she would have"),("she'll","she will"),("she's","she is"),("should've","should have"),("shouldn't","should not"),("shouldn't've","should not have"),("that's","that is"),("there'd","there had"),("there'd've","there would have"),("there're","there are"),("there's","there is"),("they'd","they had"),("they'd've","they would have"),("they'll","they will"),("they're","they are"),("they've","they have"),("wasn't","was not"),("we'd","we had"),("we'd've","we would have"),("we'll","we will"),("we're","we are"),("we've","we have"),("weren't","were not"),("what'll","what will"),("what're","what are"),("what's","what is"),("what've","what have"),("when's","when is"),("where'd","where did"),("where's","where is"),("where've","where have"),("who'd","who had"),("who'll","who will"),("who're","who are"),("who's","who is"),("who've","who have"),("why'll","why will"),("why're","why are"),("why's","why is"),("won't","will not"),("would've","would have"),("wouldn't","would not"),("wouldn't've","would not have"),("y'all","you all"),("y'all'd've","you all would have"),("you'd","you had"),("you'd've","you would have"),("you'll","you will"),("you're","you are"),("you've","you have"),("-"," ") )
+SW = (
+	'a', 'able', 'about', 'across', 'after', 'all', 'almost', 'also', 'am', 'among', 'an', 'and', 'any', 'are', 'as', 'at',
+	'be', 'because', 'been', 'but', 'by', 'can', 'cannot', 'could', 'dear', 'did', 'do', 'does', 'either', 'else', 'ever',
+	'every', 'for', 'from', 'get', 'got', 'had', 'has', 'have', 'he', 'her', 'hers', 'him', 'his', 'how', 'however', 'i',
+	'if', 'in', 'into', 'is', 'it', 'its', 'just', 'least', 'let', 'like', 'likely', 'may', 'me', 'might', 'most', 'must',
+	'my', 'neither', 'no', 'nor', 'not', 'of', 'off', 'often', 'on', 'only', 'or', 'other', 'our', 'own', 'rather', 'said',
+	'say', 'says', 'she', 'should', 'since', 'so', 'some', 'than', 'that', 'the', 'their', 'them', 'then', 'there', 'these',
+	'they', 'this', 'tis', 'to', 'too', 'twas', 'us', 'wants', 'was', 'we', 'were', 'what', 'when', 'where', 'which',
+	'while', 'who', 'whom', 'why', 'will', 'with', 'would', 'yet', 'you', 'your' )
+CC = (("aren't", "are not"), ("can't", "can not"), ("could've", "could have"), ("couldn't", "could not"),
+      ("couldn't've", "could not have"), ("didn't", "did not"), ("doesn't", "does not"), ("don't", "do not"),
+      ("hadn't", "had not"), ("hadn't've", "had not have"), ("hasn't", "has not"), ("haven't", "have not"),
+      ("he'd", "he had"), ("he'd've", "he would have"), ("he'll", "he will"), ("he's", "he is"), ("how'd", "how did"),
+      ("how'll", "how will"), ("how's", "how has"), ("I'd", "I had"), ("I'd've", "I would have"), ("I'll", "I will"),
+      ("I'm", "I am"), ("I've", "I have"), ("isn't", "is not"), ("it'd", "it had"), ("it'd've", "it would have"),
+      ("it'll", "it will"), ("it's", "it is"), ("let's", "let us"), ("ma'am", "madam"), ("mightn't", "might not"),
+      ("mightn't've", "might not have"), ("might've", "might have"), ("mustn't", "must not"), ("must've", "must have"),
+      ("needn't", "need not"), ("not've", "not have"), ("o'clock", "of the clock"), ("shan't", "shall not"),
+      ("she'd", "she had"), ("she'd've", "she would have"), ("she'll", "she will"), ("she's", "she is"),
+      ("should've", "should have"), ("shouldn't", "should not"), ("shouldn't've", "should not have"),
+      ("that's", "that is"), ("there'd", "there had"), ("there'd've", "there would have"), ("there're", "there are"),
+      ("there's", "there is"), ("they'd", "they had"), ("they'd've", "they would have"), ("they'll", "they will"),
+      ("they're", "they are"), ("they've", "they have"), ("wasn't", "was not"), ("we'd", "we had"),
+      ("we'd've", "we would have"), ("we'll", "we will"), ("we're", "we are"), ("we've", "we have"),
+      ("weren't", "were not"), ("what'll", "what will"), ("what're", "what are"), ("what's", "what is"),
+      ("what've", "what have"), ("when's", "when is"), ("where'd", "where did"), ("where's", "where is"),
+      ("where've", "where have"), ("who'd", "who had"), ("who'll", "who will"), ("who're", "who are"),
+      ("who's", "who is"), ("who've", "who have"), ("why'll", "why will"), ("why're", "why are"), ("why's", "why is"),
+      ("won't", "will not"), ("would've", "would have"), ("wouldn't", "would not"), ("wouldn't've", "would not have"),
+      ("y'all", "you all"), ("y'all'd've", "you all would have"), ("you'd", "you had"), ("you'd've", "you would have"),
+      ("you'll", "you will"), ("you're", "you are"), ("you've", "you have"), ("-", " ") )
 
 contractions = dict(CC)
 
 corpusTerms = {}
+
 
 def extractTerms(fileName, corpusTerms):
 	'''extractTerms takes two inputs and outputs a Term Frequency Dictionary. fileName is simply the file names and corpus terms is an empty dictionary.'''
@@ -40,7 +69,7 @@ def extractTerms(fileName, corpusTerms):
 				corpusTerms[term] = 1
 	if verbose == 1:
 		print(tfds)
-	return(tfds)
+	return (tfds)
 
 
 #Speech file input.
@@ -51,7 +80,7 @@ def readInput(filename):
 	for line in speechfile:
 		parse(line, D)
 	speechfile.close()
-	return(D)
+	return (D)
 
 
 #Parsing function, prepares word data for stemmer use.
@@ -63,7 +92,8 @@ def parse(documentString, D):
 		if word in contractionDict:
 			stringAccum = stringAccum + ' ' + contractionDict[word]
 	#Replace 'porter2.stem' with 'stemmer' if weak stemmer is preferred.
-	for word in [porter2.stem(word) for word in [word.strip('".,:;!?') for word in documentString.lower().split()] if (word not in SW) and (word not in contractionDict.keys()) ]:
+	for word in [porter2.stem(word) for word in [word.strip('".,:;!?') for word in documentString.lower().split()] if
+	             (word not in SW) and (word not in contractionDict.keys())]:
 		if word in D:
 			D[word] = D[word] + 1
 		else:
@@ -90,10 +120,10 @@ def parse(documentString, D):
 #     return(word)
 
 
-def topK(D,k):
+def topK(D, k):
 	'''Simple function used only for finding the top K terms in a given speech.'''
-	L = [(item,D[item]) for item in D.keys() ]
-	return(sorted(L, reverse = True, key = lambda x: x[1]) [0:k])
+	L = [(item, D[item]) for item in D.keys()]
+	return (sorted(L, reverse=True, key=lambda x: x[1])[0:k])
 
 
 def createModels(tfds, cfd, k):
@@ -106,7 +136,7 @@ def createModels(tfds, cfd, k):
 
 	for wordbanks in range(len(tfds)):
 		#Note most IDE's will evaluate w as type list containing None, because of line 107. Upon execution list w will contain type float.
-		w = [None]*len(words)
+		w = [None] * len(words)
 		for k in range(len(words)):
 
 			#Computation for term frequency
@@ -122,17 +152,17 @@ def createModels(tfds, cfd, k):
 			rightNum = len(lengthList)
 			rightDen = 1 + cfd[term]
 
-			w[k] = tf * math.log(rightNum/rightDen)
+			w[k] = tf * math.log(rightNum / rightDen)
 
 		#Begin normalization. Note w[i] will be evaluated as empty by most IDE's. It is safe to ignore this warning instance.
-		u = math.sqrt(sum([  w[i]**2 for i in range(len(w)) ]))
+		u = math.sqrt(sum([w[i] ** 2 for i in range(len(w))]))
 		for i in range(len(w)):
 			#Note w[i] will be evaluated by most IDE's as type empty until execution. It is safe to ignore this warning instance.
 			w[i] = w[i] / u
 		models.append(tuple(w))
 	if verbose == 1:
 		print(words, models)
-	return(words, models)
+	return (words, models)
 
 
 def dotProduct(tuple1, tuple2):
@@ -143,7 +173,7 @@ def dotProduct(tuple1, tuple2):
 		if verbose == 1:
 			print(tuple1)
 		dotproduct += tuple1[currentindex] * tuple2[currentindex]
-	return(dotproduct)
+	return (dotproduct)
 
 
 def averagedotproducts(models):
@@ -153,12 +183,12 @@ def averagedotproducts(models):
 	for president in range(0, len(models), 4):
 		dpList = []
 		#i is used as an index handle.
-		for i in range(president, president+3):
+		for i in range(president, president + 3):
 			#j is used as an index handle that's by definition i+1.
-			for j in range(i+1, president + 4):
-				dpList.append(dotProduct(models[i],  models[j]))
-		listofaverages.append(sum(dpList)/len(dpList))
-	return(listofaverages)
+			for j in range(i + 1, president + 4):
+				dpList.append(dotProduct(models[i], models[j]))
+		listofaverages.append(sum(dpList) / len(dpList))
+	return (listofaverages)
 
 
 def barGraph(presidentNames, listofaverages):
@@ -191,11 +221,11 @@ def compareUknowns(k, fileName, models):
 		for index in range(k):
 			for vector in president:
 				presidentAverage[index] += vector[index] / 4
-		return(presidentAverage)
+		return (presidentAverage)
 
 	for president in range(0, len(models), 4):
 		singleVectorList = []
-		for i in range(president, president+4):
+		for i in range(president, president + 4):
 			singleVectorList.append(models[i])
 		if verbose == 1:
 			print(singleVectorList)
@@ -228,9 +258,13 @@ def compareUknowns(k, fileName, models):
 			for index in range(len(listOfPresidentsAverageVectors)):
 				if verbose == 1:
 					print(index)
-				listOfBestScores[unknown][wordScoreIndex] = compare(index, unknowns[unknown][index], listOfBestScores[unknown][wordScoreIndex], listOfPresidentsAverageVectors[index][wordScoreIndex])
+				listOfBestScores[unknown][wordScoreIndex] = compare(index, unknowns[unknown][index],
+				                                                    listOfBestScores[unknown][wordScoreIndex],
+				                                                    listOfPresidentsAverageVectors[index][
+					                                                    wordScoreIndex])
 
 	return zip(fileName, [[files.P[b] for a, b in columns] for columns in listOfBestScores])
+
 
 if __name__ == "__main__":
 	#Debug option. Set to 1 to print debug information:
